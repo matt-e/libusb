@@ -66,6 +66,15 @@ func (dev *Device) GetPortNumber() (int, error) {
 	return int(portNumber), nil
 }
 
+func (dev *Device) GetPortNumbers() ([]uint8, error) {
+	path := make([]uint8, 7) // Max is 7 according to USB 3.0 Specification
+	n, err := C.libusb_get_port_numbers(dev.libusbDevice, (*C.uchar)(unsafe.Pointer(&path[0])), 7)
+	if err != nil {
+		return nil, fmt.Errorf("Port numbers are unavailable for device %v", dev)
+	}
+	return path[0:n], nil
+}
+
 // GetMaxPacketSize is a "convenience function to retrieve the wMaxPacketSize
 // value for a particular endpoint in the active device configuration. This
 // function was originally intended to be of assistance when setting up
